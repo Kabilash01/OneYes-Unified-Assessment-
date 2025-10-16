@@ -51,6 +51,296 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Profile fields
+    dateOfBirth: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other', 'prefer-not-to-say'],
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    bio: {
+      type: String,
+      maxlength: 500,
+    },
+    studentId: {
+      type: String,
+      trim: true,
+    },
+    department: {
+      type: String,
+      trim: true,
+    },
+    yearSemester: {
+      type: String,
+      trim: true,
+    },
+    enrollmentDate: {
+      type: Date,
+    },
+    secondaryEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    emergencyContactName: {
+      type: String,
+      trim: true,
+    },
+    emergencyContactPhone: {
+      type: String,
+      trim: true,
+    },
+    address: {
+      type: String,
+      trim: true,
+    },
+    socialLinks: {
+      linkedin: String,
+      github: String,
+      portfolio: String,
+    },
+    // Settings fields
+    settings: {
+      language: {
+        type: String,
+        default: 'en',
+      },
+      timezone: {
+        type: String,
+        default: 'UTC',
+      },
+      dateFormat: {
+        type: String,
+        default: 'MM/DD/YYYY',
+      },
+      timeFormat: {
+        type: String,
+        enum: ['12h', '24h'],
+        default: '12h',
+      },
+      assessmentView: {
+        type: String,
+        enum: ['grid', 'list'],
+        default: 'grid',
+      },
+      itemsPerPage: {
+        type: Number,
+        default: 9,
+      },
+      defaultSort: {
+        type: String,
+        default: 'recent',
+      },
+      autoSave: {
+        enabled: {
+          type: Boolean,
+          default: true,
+        },
+        interval: {
+          type: Number,
+          default: 30, // seconds
+        },
+        showNotifications: {
+          type: Boolean,
+          default: true,
+        },
+      },
+      notifications: {
+        email: {
+          newAssessment: {
+            type: Boolean,
+            default: true,
+          },
+          submissionEvaluated: {
+            type: Boolean,
+            default: true,
+          },
+          upcomingReminder: {
+            type: Boolean,
+            default: true,
+          },
+          deadlineReminder: {
+            type: Boolean,
+            default: true,
+          },
+          achievementUnlocked: {
+            type: Boolean,
+            default: true,
+          },
+          weeklySummary: {
+            type: Boolean,
+            default: true,
+          },
+        },
+        browser: {
+          enabled: {
+            type: Boolean,
+            default: true,
+          },
+          sound: {
+            type: String,
+            default: 'default',
+          },
+          desktop: {
+            type: Boolean,
+            default: true,
+          },
+        },
+        inApp: {
+          showBadge: {
+            type: Boolean,
+            default: true,
+          },
+          autoMarkRead: {
+            type: Boolean,
+            default: false,
+          },
+          position: {
+            type: String,
+            default: 'top-right',
+          },
+        },
+        digestMode: {
+          type: Boolean,
+          default: false,
+        },
+        quietHours: {
+          enabled: {
+            type: Boolean,
+            default: false,
+          },
+          start: String,
+          end: String,
+        },
+      },
+      appearance: {
+        theme: {
+          type: String,
+          enum: ['light', 'dark', 'auto'],
+          default: 'light',
+        },
+        primaryColor: {
+          type: String,
+          default: '#5B5FEF',
+        },
+        fontSize: {
+          type: String,
+          enum: ['small', 'medium', 'large', 'extra-large'],
+          default: 'medium',
+        },
+        layoutDensity: {
+          type: String,
+          enum: ['comfortable', 'compact', 'spacious'],
+          default: 'comfortable',
+        },
+        sidebarPosition: {
+          type: String,
+          enum: ['left', 'right'],
+          default: 'left',
+        },
+        sidebarDefaultState: {
+          type: String,
+          enum: ['expanded', 'collapsed'],
+          default: 'expanded',
+        },
+        dashboardCustomization: {
+          showWelcomeBanner: {
+            type: Boolean,
+            default: true,
+          },
+          showQuickActions: {
+            type: Boolean,
+            default: true,
+          },
+          showRecentActivity: {
+            type: Boolean,
+            default: true,
+          },
+          defaultTab: {
+            type: String,
+            default: 'overview',
+          },
+        },
+      },
+      privacy: {
+        profileVisibility: {
+          type: String,
+          enum: ['everyone', 'instructors-only', 'no-one'],
+          default: 'instructors-only',
+        },
+        showActivityStatus: {
+          type: Boolean,
+          default: true,
+        },
+        sharePerformance: {
+          type: Boolean,
+          default: true,
+        },
+        allowAnalytics: {
+          type: Boolean,
+          default: true,
+        },
+        allowTracking: {
+          type: Boolean,
+          default: true,
+        },
+        allowRecommendations: {
+          type: Boolean,
+          default: true,
+        },
+      },
+      accessibility: {
+        highContrast: {
+          type: Boolean,
+          default: false,
+        },
+        reduceMotion: {
+          type: Boolean,
+          default: false,
+        },
+        largeCursor: {
+          type: Boolean,
+          default: false,
+        },
+        focusIndicators: {
+          type: Boolean,
+          default: true,
+        },
+        screenReaderOptimized: {
+          type: Boolean,
+          default: false,
+        },
+        readNotificationsAloud: {
+          type: Boolean,
+          default: false,
+        },
+        keyboardShortcuts: {
+          type: Boolean,
+          default: true,
+        },
+        showShortcutHints: {
+          type: Boolean,
+          default: true,
+        },
+        dyslexiaFriendlyFont: {
+          type: Boolean,
+          default: false,
+        },
+        lineHeight: {
+          type: Number,
+          default: 1.5,
+        },
+        letterSpacing: {
+          type: Number,
+          default: 0,
+        },
+      },
+    },
   },
   {
     timestamps: true,

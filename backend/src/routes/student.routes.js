@@ -18,8 +18,33 @@ const {
   getUpcomingAssessments,
   getRecentActivity,
 } = require('../controllers/studentDashboardController');
+const {
+  getNotifications,
+  getUnreadCount,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+} = require('../controllers/notificationController');
+const {
+  getProfile,
+  updateProfile,
+  uploadAvatar,
+  changePassword,
+  getActivity,
+  getSessions,
+  terminateSession,
+} = require('../controllers/profileController');
+const {
+  getSettings,
+  updateGeneralSettings,
+  updateNotificationSettings,
+  updateAppearanceSettings,
+  updatePrivacySettings,
+  updateAccessibilitySettings,
+} = require('../controllers/settingsController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const roleMiddleware = require('../middlewares/roleMiddleware');
+const uploadMiddleware = require('../middlewares/uploadMiddleware');
 const { objectIdValidation, paginationValidation } = require('../utils/validators');
 
 // All student routes require authentication and student role
@@ -116,5 +141,147 @@ router.get('/submissions', paginationValidation, getSubmissions);
  * @access  Private (Student)
  */
 router.get('/submissions/:id', objectIdValidation('id'), getSubmissionById);
+
+// ============================================
+// NOTIFICATION ROUTES
+// ============================================
+
+/**
+ * @route   GET /api/student/notifications
+ * @desc    Get all notifications
+ * @access  Private (Student)
+ */
+router.get('/notifications', getNotifications);
+
+/**
+ * @route   GET /api/student/notifications/count
+ * @desc    Get unread notification count
+ * @access  Private (Student)
+ */
+router.get('/notifications/count', getUnreadCount);
+
+/**
+ * @route   PUT /api/student/notifications/:id/read
+ * @desc    Mark notification as read
+ * @access  Private (Student)
+ */
+router.put('/notifications/:id/read', objectIdValidation('id'), markAsRead);
+
+/**
+ * @route   PUT /api/student/notifications/mark-all-read
+ * @desc    Mark all notifications as read
+ * @access  Private (Student)
+ */
+router.put('/notifications/mark-all-read', markAllAsRead);
+
+/**
+ * @route   DELETE /api/student/notifications/:id
+ * @desc    Delete notification
+ * @access  Private (Student)
+ */
+router.delete('/notifications/:id', objectIdValidation('id'), deleteNotification);
+
+// ============================================
+// PROFILE ROUTES
+// ============================================
+
+/**
+ * @route   GET /api/student/profile
+ * @desc    Get student profile
+ * @access  Private (Student)
+ */
+router.get('/profile', getProfile);
+
+/**
+ * @route   PUT /api/student/profile
+ * @desc    Update student profile
+ * @access  Private (Student)
+ */
+router.put('/profile', updateProfile);
+
+/**
+ * @route   POST /api/student/profile/avatar
+ * @desc    Upload profile avatar
+ * @access  Private (Student)
+ */
+router.post(
+  '/profile/avatar',
+  uploadMiddleware.single('avatar'),
+  uploadAvatar
+);
+
+/**
+ * @route   PUT /api/student/profile/password
+ * @desc    Change password
+ * @access  Private (Student)
+ */
+router.put('/profile/password', changePassword);
+
+/**
+ * @route   GET /api/student/profile/activity
+ * @desc    Get activity log
+ * @access  Private (Student)
+ */
+router.get('/profile/activity', getActivity);
+
+/**
+ * @route   GET /api/student/profile/sessions
+ * @desc    Get active sessions
+ * @access  Private (Student)
+ */
+router.get('/profile/sessions', getSessions);
+
+/**
+ * @route   DELETE /api/student/profile/sessions/:id
+ * @desc    Terminate session
+ * @access  Private (Student)
+ */
+router.delete('/profile/sessions/:id', terminateSession);
+
+// ============================================
+// SETTINGS ROUTES
+// ============================================
+
+/**
+ * @route   GET /api/student/settings
+ * @desc    Get all settings
+ * @access  Private (Student)
+ */
+router.get('/settings', getSettings);
+
+/**
+ * @route   PUT /api/student/settings/general
+ * @desc    Update general settings
+ * @access  Private (Student)
+ */
+router.put('/settings/general', updateGeneralSettings);
+
+/**
+ * @route   PUT /api/student/settings/notifications
+ * @desc    Update notification settings
+ * @access  Private (Student)
+ */
+router.put('/settings/notifications', updateNotificationSettings);
+
+/**
+ * @route   PUT /api/student/settings/appearance
+ * @desc    Update appearance settings
+ * @access  Private (Student)
+ */
+router.put('/settings/appearance', updateAppearanceSettings);
+
+/**
+ * @route   PUT /api/student/settings/privacy
+ * @desc    Update privacy settings
+ * @access  Private (Student)
+ */
+router.put('/settings/privacy', updatePrivacySettings);
+
+/**
+ * @route   PUT /api/student/settings/accessibility
+ * @desc    Update accessibility settings
+ * @access  Private (Student)
+ */
+router.put('/settings/accessibility', updateAccessibilitySettings);
 
 module.exports = router;

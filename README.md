@@ -176,7 +176,7 @@ Content-Type: application/json
   "email": "john@example.com",
   "password": "securePassword123"
 }
-```
+```-
 
 #### Get Current User
 ```http

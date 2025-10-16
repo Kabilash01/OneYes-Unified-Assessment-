@@ -16,6 +16,7 @@ const authRoutes = require('./routes/auth.routes');
 const studentRoutes = require('./routes/student.routes');
 const instructorRoutes = require('./routes/instructor.routes');
 const adminRoutes = require('./routes/admin.routes');
+const helpRoutes = require('./routes/help.routes');
 
 // Initialize express app
 const app = express();
@@ -52,7 +53,7 @@ if (process.env.NODE_ENV === 'development') {
 // Rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 5, // 5 requests per windowMs
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // 1000 requests per windowMs (increased for development)
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
@@ -68,7 +69,7 @@ app.use('/api/auth/register', authLimiter);
 // General rate limiter for all API routes
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per windowMs
+  max: 1000, // 1000 requests per windowMs (increased for development)
   message: {
     success: false,
     message: 'Too many requests, please try again later.',
@@ -102,6 +103,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/instructor', instructorRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/help', helpRoutes);
 
 // Welcome route
 app.get('/', (req, res) => {

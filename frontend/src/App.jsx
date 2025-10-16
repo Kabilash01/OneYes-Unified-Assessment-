@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
+import { SidebarProvider } from './context/SidebarContext';
 import { ProtectedRoute, RoleBasedRoute, PublicRoute } from './components/ProtectedRoute';
 
 // Common Components
@@ -18,6 +19,11 @@ import AssessmentCalendar from './pages/student/AssessmentCalendar';
 import TestInterface from './pages/student/TestInterface';
 import StudentSubmissions from './pages/student/Submissions';
 import StudentProfile from './pages/student/Profile';
+import NotificationsPage from './pages/student/NotificationsPage';
+import UpcomingTestsPage from './pages/student/UpcomingTestsPage';
+import ProfilePage from './pages/student/ProfilePage';
+import SettingsPage from './pages/student/SettingsPage';
+import HelpSupportPage from './pages/student/HelpSupportPage';
 
 // Instructor Components (placeholders)
 import InstructorDashboard from './pages/instructor/Dashboard';
@@ -62,9 +68,10 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Navbar />
-          <Routes>
+        <SidebarProvider>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Navbar />
+            <Routes>
             {/* Public Routes */}
             <Route
               path="/"
@@ -148,6 +155,46 @@ function App() {
                 </RoleBasedRoute>
               }
             />
+            <Route
+              path="/student/notifications"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <NotificationsPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/upcoming-tests"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <UpcomingTestsPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/profile"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <ProfilePage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/settings"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <SettingsPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/help"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <HelpSupportPage />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Instructor Routes */}
             <Route
@@ -227,6 +274,7 @@ function App() {
             theme="colored"
           />
         </div>
+        </SidebarProvider>
       </AuthProvider>
     </Router>
   );
