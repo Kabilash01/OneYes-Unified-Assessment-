@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600;
+  }
+
+  .btn-danger {
+    @apply bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+  }
+
+  .btn-success {
+    @apply bg-success-600 text-white hover:bg-success-700 focus:ring-success-500;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:ring-danger-500;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-card p-6 transition-all;
+  }
+
+  .card-hover {
+    @apply hover:shadow-lg hover:scale-[1.02];
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300;
+  }
+
+  .badge-success {
+    @apply bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-300;
+  }
+
+  .badge-warning {
+    @apply bg-warning-100 text-warning-800 dark:bg-warning-900 dark:text-warning-300;
+  }
+
+  .badge-danger {
+    @apply bg-danger-100 text-danger-800 dark:bg-danger-900 dark:text-danger-300;
+  }
+
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* React Quill Editor Styles */
+.ql-container {
+  @apply border-gray-300 dark:border-gray-600 rounded-b-lg;
+}
+
+.ql-toolbar {
+  @apply border-gray-300 dark:border-gray-600 rounded-t-lg bg-gray-50 dark:bg-gray-700;
+}
+
+.ql-editor {
+  @apply min-h-[200px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+}
+
+/* React Toastify Custom Styles */
+.Toastify__toast {
+  @apply rounded-lg shadow-lg;
+}
+
+.Toastify__toast--success {
+  @apply bg-success-600;
+}
+
+.Toastify__toast--error {
+  @apply bg-danger-600;
+}
+
+.Toastify__toast--warning {
+  @apply bg-warning-600;
+}
+
+.Toastify__toast--info {
+  @apply bg-primary-600;
+}
+
+/* React Calendar Custom Styles */
+.react-calendar {
+  @apply w-full border-none rounded-lg;
+}
+
+.react-calendar__tile {
+  @apply p-3 text-sm rounded-lg transition-all;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  @apply bg-primary-50 dark:bg-primary-900;
+}
+
+.react-calendar__tile--now {
+  @apply bg-primary-100 dark:bg-primary-800;
+}
+
+.react-calendar__tile--active {
+  @apply bg-primary-600 text-white;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  @apply text-danger-600 dark:text-danger-400;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  @apply text-gray-400 dark:text-gray-600;
+}
+
+/* Calendar Status Colors */
+.calendar-available {
+  @apply bg-green-100 dark:bg-green-900 border-2 border-green-500;
+}
+
+.calendar-starting-soon {
+  @apply bg-yellow-100 dark:bg-yellow-900 border-2 border-yellow-500;
+}
+
+.calendar-deadline-soon {
+  @apply bg-orange-100 dark:bg-orange-900 border-2 border-orange-500;
+}
+
+.calendar-expired {
+  @apply bg-red-100 dark:bg-red-900 border-2 border-red-500;
+}
+
+.calendar-completed {
+  @apply bg-blue-100 dark:bg-blue-900 border-2 border-blue-500;
+}
+
+.calendar-upcoming {
+  @apply bg-gray-100 dark:bg-gray-700 border-2 border-gray-400;
+}
+
+/* Custom scrollbar for specific containers */
+.custom-scrollbar::-webkit-scrollbar {
+  @apply w-1.5;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
