@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../common/Button';
 import Input from '../common/Input';
+import MinimalFooter from '../common/MinimalFooter';
 
 /**
  * Signup validation schema
@@ -57,8 +58,9 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen flex-col">
+      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+        <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto w-16 h-16 bg-primary-600 rounded-lg flex items-center justify-center mb-4">
@@ -223,7 +225,10 @@ const Signup = () => {
             </Form>
           )}
         </Formik>
+        </div>
       </div>
+      
+      <MinimalFooter />
     </div>
   );
 };

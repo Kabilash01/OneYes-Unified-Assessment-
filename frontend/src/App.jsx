@@ -12,7 +12,7 @@ import Navbar from './components/common/Navbar';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 
-// Student Components (placeholders - will be created)
+// Student Components
 import StudentDashboard from './pages/student/Dashboard';
 import AssessmentCatalog from './pages/student/AssessmentCatalog';
 import AssessmentCalendar from './pages/student/AssessmentCalendar';
@@ -25,6 +25,11 @@ import ProfilePage from './pages/student/ProfilePage';
 import SettingsPage from './pages/student/SettingsPage';
 import HelpSupportPage from './pages/student/HelpSupportPage';
 
+// New Student Components (Phase 1-3)
+import TakeTestPage from './pages/student/TakeTestPage';
+import SubmissionsPage from './pages/student/SubmissionsPage';
+import SubmissionDetailPage from './pages/student/SubmissionDetailPage';
+
 // Instructor Components (placeholders)
 import InstructorDashboard from './pages/instructor/Dashboard';
 import CreateAssessment from './pages/instructor/CreateAssessment';
@@ -36,48 +41,21 @@ import AdminDashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
 import AssessmentOversight from './pages/admin/AssessmentOversight';
 
-// Home Page
-const HomePage = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-        Welcome to Unified Assessment Platform
-      </h1>
-      <p className="text-gray-600 dark:text-gray-400 mb-8">
-        Create, manage, and take online assessments with ease
-      </p>
-      <div className="flex gap-4 justify-center">
-        <a
-          href="/login"
-          className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          Get Started
-        </a>
-        <a
-          href="/signup"
-          className="px-6 py-3 border-2 border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900 transition-colors"
-        >
-          Sign Up
-        </a>
-      </div>
-    </div>
-  </div>
-);
+// Landing Page
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <SidebarProvider>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Navbar />
-            <Routes>
+          <Routes>
             {/* Public Routes */}
             <Route
               path="/"
               element={
                 <PublicRoute>
-                  <HomePage />
+                  <LandingPage />
                 </PublicRoute>
               }
             />
@@ -195,6 +173,38 @@ function App() {
                 </RoleBasedRoute>
               }
             />
+            <Route
+              path="/student/take-test/:id"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <TakeTestPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/my-submissions"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <SubmissionsPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/submissions"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <SubmissionsPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/submissions/:id"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <SubmissionDetailPage />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Instructor Routes */}
             <Route
@@ -273,7 +283,6 @@ function App() {
             pauseOnHover
             theme="colored"
           />
-        </div>
         </SidebarProvider>
       </AuthProvider>
     </Router>

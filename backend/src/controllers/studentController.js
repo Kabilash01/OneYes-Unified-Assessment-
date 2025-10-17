@@ -106,7 +106,7 @@ const getAvailableAssessments = async (req, res, next) => {
     }
 
     const assessments = await Assessment.find(query)
-      .populate('createdBy', 'name email')
+      .populate('createdBy', 'name email avatar')
       .select('-questions.correctAnswer') // Don't send correct answers
       .sort(sortQuery)
       .skip(skip)
@@ -114,15 +114,67 @@ const getAvailableAssessments = async (req, res, next) => {
 
     const total = await Assessment.countDocuments(query);
 
+    // Add assessment status for each assessment
+    const assessmentsWithStatus = await Promise.all(
+      assessments.map(async (assessment) => {
+        const submission = await Submission.findOne({
+          assessmentId: assessment._id,
+          studentId
+        });
+
+        let assessmentStatus = 'available';
+        const now = new Date();
+
+        if (submission) {
+          if (submission.status === 'submitted' || submission.status === 'evaluated') {
+            assessmentStatus = 'completed';
+          } else if (submission.status === 'in-progress') {
+            assessmentStatus = 'in-progress';
+          }
+        } else if (new Date(assessment.startDate) > now) {
+          assessmentStatus = 'upcoming';
+        } else if (new Date(assessment.endDate) < now) {
+          assessmentStatus = 'expired';
+        }
+
+        return {
+          ...assessment.toObject(),
+          assessmentStatus,
+          submissionId: submission?._id
+        };
+      })
+    );
+
+    // Get filter options for frontend
+    const subjects = await Assessment.distinct('subjects', {
+      status: 'published',
+      $or: [{ isPublic: true }, { assignedTo: studentId }]
+    });
+
+    const User = require('../models/User');
+    const instructorIds = await Assessment.find({
+      status: 'published',
+      $or: [{ isPublic: true }, { assignedTo: studentId }]
+    }).distinct('createdBy');
+    
+    const instructors = await User.find({ 
+      _id: { $in: instructorIds } 
+    }).select('name email avatar');
+
     res.status(200).json({
       success: true,
       data: {
-        assessments,
+        assessments: assessmentsWithStatus,
         pagination: {
           total,
           page: parseInt(page),
-          pages: Math.ceil(total / parseInt(limit)),
+          limit: parseInt(limit),
+          totalPages: Math.ceil(total / parseInt(limit)),
         },
+        filters: {
+          subjects,
+          instructors
+        }
       },
     });
   } catch (error) {

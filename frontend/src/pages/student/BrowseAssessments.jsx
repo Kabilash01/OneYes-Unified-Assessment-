@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, Grid, List } from 'lucide-react';
 import { useAssessments } from '../../hooks/useAssessments';
 import { useDebounce } from '../../hooks/useDebounce';
-import DashboardLayout from '../../components/layout/DashboardLayout';
 import FilterSidebar from '../../components/assessments/FilterSidebar';
 import AssessmentCard from '../../components/assessments/AssessmentCard';
 import AssessmentListItem from '../../components/assessments/AssessmentListItem';
@@ -37,17 +36,16 @@ const UpcomingTestsPage = () => {
   }, [debouncedSearch]);
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Browse Assessments
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Find and start your upcoming assessments
-          </p>
-        </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Browse Assessments
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Find and start your upcoming assessments
+        </p>
+      </div>
 
       {/* Toolbar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -105,7 +103,7 @@ const UpcomingTestsPage = () => {
       {/* Main Content */}
       <div className="flex gap-6">
         {/* Filter Sidebar */}
-        {(showFilters || typeof window !== 'undefined' && window.innerWidth >= 1024) && (
+        {(showFilters || (typeof window !== 'undefined' && window.innerWidth >= 1024)) && (
           <FilterSidebar
             filters={filters}
             params={params}
@@ -174,8 +172,7 @@ const UpcomingTestsPage = () => {
           )}
         </div>
       </div>
-      </div>
-    </DashboardLayout>
+    </div>
   );
 };
 
