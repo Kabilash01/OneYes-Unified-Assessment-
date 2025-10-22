@@ -38,6 +38,1185 @@ This document provides a comprehensive overview of the OneYes Unified Assessment
 
 ---
 
+## 🏢 Complete Module & Feature Overview
+
+### Platform Roles
+
+The OneYes Unified Assessment Platform supports three distinct user roles, each with dedicated modules and features:
+
+1. **Admin** - Full platform management and oversight
+2. **Instructor** - Assessment creation, evaluation, and student management
+3. **Student** - Test taking, submission tracking, and performance monitoring
+
+---
+
+## 📦 Module Catalog
+
+### 1. Authentication & Authorization Module
+
+**Purpose**: Secure user authentication, password management, and role-based access control
+
+**Components**:
+- `frontend/src/pages/auth/Login.jsx` - User login interface
+- `frontend/src/pages/auth/Register.jsx` - New user registration
+- `frontend/src/pages/auth/ForgotPassword.jsx` - Password reset request
+- `frontend/src/pages/auth/ResetPassword.jsx` - Password reset form with token validation
+- `frontend/src/components/ProtectedRoute.jsx` - Route guard for authenticated pages
+
+**Backend Routes**:
+- `POST /api/auth/login` - User authentication
+- `POST /api/auth/register` - New user registration
+- `POST /api/auth/forgot-password` - Request password reset email
+- `POST /api/auth/reset-password/:token` - Reset password with token
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/logout` - User logout
+
+**Features**:
+- JWT-based authentication with 7-day expiration
+- Bcrypt password hashing (10 rounds)
+- Role-based authorization (admin, instructor, student)
+- Password reset via email with time-limited tokens
+- "Remember me" functionality
+- Automatic token refresh
+- Session management
+
+**Security**:
+- Rate limiting on authentication endpoints
+- Password complexity requirements (min 6 characters)
+- Token expiration and validation
+- Protected routes with middleware
+- XSS and CSRF protection
+
+---
+
+### 2. Admin Dashboard Module
+
+**Purpose**: Centralized platform administration and monitoring
+
+**Components**:
+- `frontend/src/pages/admin/AdminDashboard.jsx` - Main admin overview
+- `frontend/src/pages/admin/Dashboard.jsx` - Admin homepage
+- `frontend/src/components/admin/DashboardOverview.jsx` - Statistics widgets
+- `frontend/src/components/admin/AdminNavbar.jsx` - Admin navigation bar
+- `frontend/src/components/admin/AdminSidebar.jsx` - Admin sidebar menu
+- `frontend/src/components/admin/SuspiciousAlerts.jsx` - Security alerts widget
+
+**Backend Routes**:
+- `GET /api/admin/dashboard/stats` - Platform statistics
+- `GET /api/admin/dashboard/recent-activity` - Recent system activity
+- `GET /api/admin/dashboard/alerts` - Security and system alerts
+
+**Features**:
+- Real-time platform statistics (total users, active assessments, submissions)
+- User growth charts and trends
+- Assessment completion rates
+- System health monitoring
+- Recent activity feed
+- Suspicious activity alerts
+- Quick action buttons
+- Role distribution charts
+- Performance metrics overview
+
+**Metrics Displayed**:
+- Total users by role
+- Active assessments count
+- Pending submissions
+- Average completion rates
+- Daily/weekly/monthly user growth
+- Platform uptime
+- Storage usage
+
+---
+
+### 3. User Management Module
+
+**Purpose**: Complete CRUD operations for platform users
+
+**Components**:
+- `frontend/src/pages/admin/UserManagement.jsx` - User management interface
+- `frontend/src/components/admin/BulkUserImport.jsx` - CSV bulk import modal
+
+**Backend Routes**:
+- `GET /api/admin/users` - List all users with pagination and filters
+- `POST /api/admin/users` - Create single user
+- `POST /api/admin/users/bulk-import` - Bulk CSV import
+- `PUT /api/admin/users/:id` - Update user details
+- `DELETE /api/admin/users/:id` - Suspend/delete user
+- `PATCH /api/admin/users/:id/activate` - Reactivate user
+- `PATCH /api/admin/users/:id/reset-password` - Admin password reset
+
+**Features**:
+- **User Listing**: Paginated table with 10 users per page
+- **Search**: By name, email, or institute code
+- **Filters**: By role (admin/instructor/student) and status (active/inactive)
+- **Single User Creation**: Form with validation
+- **Bulk Import**: CSV upload with validation and preview
+- **Edit User**: Update name, role, institute code, active status
+- **Suspend User**: Deactivate account (soft delete)
+- **User Details**: Avatar, name, email, role badge, status badge
+
+**Bulk Import Features**:
+- CSV template download with sample data
+- Drag-and-drop file upload
+- Real-time row validation
+- Preview table with validation status
+- Duplicate email detection
+- Row-level error reporting
+- Success/failure summary
+- Automatic welcome emails
+
+**Validation Rules**:
+- Name: Required, minimum 2 characters
+- Email: Required, valid format, unique
+- Password: Minimum 6 characters (8 for bulk import)
+- Role: Must be admin, instructor, or student
+- Institute Code: Optional
+
+---
+
+### 4. Assessment Oversight Module
+
+**Purpose**: Admin monitoring and management of all platform assessments
+
+**Components**:
+- `frontend/src/pages/admin/AssessmentOversight.jsx` - Assessment monitoring dashboard
+
+**Backend Routes**:
+- `GET /api/admin/assessments` - List all assessments
+- `GET /api/admin/assessments/:id` - Get assessment details
+- `DELETE /api/admin/assessments/:id` - Delete assessment
+- `PATCH /api/admin/assessments/:id/publish` - Force publish/unpublish
+- `GET /api/admin/assessments/:id/submissions` - View all submissions
+- `GET /api/admin/assessments/:id/statistics` - Assessment statistics
+
+**Features**:
+- View all assessments across all instructors
+- Filter by status (draft, published, completed, archived)
+- Filter by subject, difficulty, instructor
+- Search by title or description
+- Assessment statistics (attempts, completion rate, average score)
+- Force publish/unpublish capabilities
+- Delete assessments with confirmation
+- View submission details
+- Assessment analytics
+- Plagiarism detection alerts
+- Time limit violations
+- Bulk actions (publish, archive, delete)
+
+**Displayed Information**:
+- Assessment title and description
+- Creator (instructor name)
+- Subject and difficulty level
+- Total questions and total marks
+- Duration and time limit
+- Scheduled date and deadline
+- Status (draft/published/active/completed)
+- Number of submissions
+- Average score
+- Completion percentage
+
+---
+
+### 5. Activity Logs Module
+
+**Purpose**: Comprehensive audit trail of all platform activities
+
+**Components**:
+- `frontend/src/pages/admin/ActivityLogs.jsx` - Activity log viewer
+
+**Backend Routes**:
+- `GET /api/admin/logs` - Retrieve activity logs with filters
+- `GET /api/admin/logs/export` - Export logs as CSV/JSON
+- `DELETE /api/admin/logs/clear` - Clear old logs (admin only)
+
+**Features**:
+- **Log Types**:
+  - User login/logout
+  - User creation/update/deletion
+  - Assessment creation/update/deletion
+  - Submission events
+  - Settings changes
+  - Bulk imports
+  - Admin actions
+  - Security events
+
+- **Filtering**:
+  - By date range (today, week, month, custom)
+  - By user (admin, instructor, student)
+  - By action type
+  - By resource type
+  - Search by description
+
+- **Display Information**:
+  - Timestamp (precise to milliseconds)
+  - User (name and role)
+  - Action performed
+  - Resource affected
+  - IP address
+  - Status (success/failure)
+  - Additional details/metadata
+
+- **Export Options**:
+  - CSV format
+  - JSON format
+  - Date range selection
+  - Filter preservation
+
+**Use Cases**:
+- Security auditing
+- Compliance reporting
+- User behavior tracking
+- Troubleshooting issues
+- Performance analysis
+- Detecting suspicious activity
+
+---
+
+### 6. Notifications Module
+
+**Purpose**: Real-time and persistent notification system for all users
+
+**Components**:
+- `frontend/src/pages/admin/NotificationsPage.jsx` - Admin notifications
+- `frontend/src/pages/student/NotificationsPage.jsx` - Student notifications
+- `frontend/src/context/NotificationContext.jsx` - Global notification state
+- `frontend/src/components/admin/NotificationBell.jsx` - Notification icon with badge
+- `frontend/src/components/admin/NotificationPanel.jsx` - Notification dropdown
+
+**Backend Routes**:
+- **Admin**: 
+  - `GET /api/admin/notifications` - Get admin notifications
+  - `GET /api/admin/notifications/unread-count` - Unread count
+  - `PATCH /api/admin/notifications/:id/read` - Mark as read
+  - `PATCH /api/admin/notifications/mark-all-read` - Mark all as read
+  
+- **Instructor**:
+  - `GET /api/instructor/notifications` - Get instructor notifications
+  - Similar endpoints as admin
+  
+- **Student**:
+  - `GET /api/student/notifications` - Get student notifications
+  - Similar endpoints as admin
+
+**Features**:
+- **Role-Based Notifications**: Each role gets relevant notifications
+- **Real-Time Updates**: Polling every 5 minutes (optimized)
+- **Unread Badge**: Shows count of unread notifications
+- **Notification Types**:
+  - System announcements
+  - Assessment published
+  - Assessment graded
+  - New message/chat
+  - Support ticket updates
+  - Password reset confirmations
+  - Account status changes
+  - Welcome messages
+  
+- **Actions**:
+  - Mark individual as read
+  - Mark all as read
+  - Delete notification
+  - Click to navigate to related resource
+
+- **Pagination**: 20 notifications per page
+- **Filtering**: By type, read/unread status
+- **Authentication-Aware**: Only fetches when logged in
+
+**Notification Content**:
+- Title (bold)
+- Message body
+- Timestamp (relative: "2 hours ago")
+- Type icon (info, success, warning, error)
+- Read/unread indicator
+- Action link (optional)
+
+---
+
+### 7. Announcements Module
+
+**Purpose**: Platform-wide communication system
+
+**Components**:
+- `frontend/src/pages/admin/AnnouncementsPage.jsx` - Admin announcement management
+- `frontend/src/components/admin/SendAnnouncementModal.jsx` - Create announcement modal
+
+**Backend Routes**:
+- `GET /api/admin/announcements` - List all announcements
+- `POST /api/admin/announcements` - Create announcement
+- `PUT /api/admin/announcements/:id` - Update announcement
+- `DELETE /api/admin/announcements/:id` - Delete announcement
+- `POST /api/admin/announcements/:id/send` - Send announcement
+- `GET /api/announcements` - User view (role-filtered)
+
+**Features**:
+- **Create Announcements**:
+  - Title and rich text content
+  - Target audience (all users, students only, instructors only, specific institute)
+  - Priority level (low, normal, high, urgent)
+  - Schedule for future delivery
+  - Attach files/documents
+  
+- **Delivery Methods**:
+  - In-app notification
+  - Email notification
+  - Both
+
+- **Management**:
+  - Draft/publish workflow
+  - Edit before sending
+  - Delete scheduled announcements
+  - View delivery status
+  - Resend failed deliveries
+
+- **Display**:
+  - Announcement list with filters
+  - Priority badges (color-coded)
+  - Recipient count
+  - Delivery status
+  - Read statistics
+
+**Use Cases**:
+- Platform maintenance notifications
+- Policy updates
+- Event announcements
+- Emergency alerts
+- Feature releases
+- Scheduled downtime notices
+
+---
+
+### 8. Calendar Module
+
+**Purpose**: Centralized schedule management for assessments and events
+
+**Components**:
+- `frontend/src/pages/admin/ActivityCalendar.jsx` - Admin calendar view
+- `frontend/src/pages/instructor/EvaluationCalendar.jsx` - Instructor calendar
+- `frontend/src/pages/student/AssessmentCalendar.jsx` - Student calendar
+- `frontend/src/components/common/CalendarView.jsx` - Reusable calendar component
+
+**Backend Routes**:
+- `GET /api/calendar/events` - Get events for user role
+- `POST /api/calendar/events` - Create calendar event (admin/instructor)
+- `PUT /api/calendar/events/:id` - Update event
+- `DELETE /api/calendar/events/:id` - Delete event
+- `GET /api/calendar/assessments` - Get scheduled assessments
+
+**Features**:
+- **Calendar Views**:
+  - Month view (default)
+  - Week view
+  - Day view
+  - Agenda/list view
+
+- **Event Types**:
+  - Scheduled assessments
+  - Submission deadlines
+  - Evaluation deadlines
+  - System maintenance
+  - Announcements
+  - Custom events (admin)
+
+- **Color Coding**:
+  - Blue: Upcoming assessments
+  - Green: Completed assessments
+  - Red: Overdue submissions
+  - Yellow: Pending evaluations
+  - Purple: System events
+
+- **Interactions**:
+  - Click event for details
+  - Create new event (admin/instructor)
+  - Edit event
+  - Delete event
+  - Export to iCal/Google Calendar
+
+- **Filters**:
+  - By event type
+  - By subject
+  - By instructor (admin view)
+  - Date range
+
+**Role-Specific Features**:
+- **Admin**: View all events, create system events
+- **Instructor**: View own assessments, create assessment schedules
+- **Student**: View enrolled assessments, submission deadlines
+
+---
+
+### 9. Analytics & Reports Module
+
+**Purpose**: Data-driven insights and performance analytics
+
+**Components**:
+- `frontend/src/pages/admin/AdminAnalyticsDashboard.jsx` - Admin analytics
+- `frontend/src/pages/instructor/InstructorAnalyticsDashboard.jsx` - Instructor analytics
+- `frontend/src/pages/student/StudentAnalyticsDashboard.jsx` - Student analytics
+- `frontend/src/components/analytics/*` - Chart components
+
+**Analytics Components**:
+- `PerformanceChart.jsx` - Line/bar charts for performance trends
+- `AssessmentDistribution.jsx` - Pie charts for assessment breakdown
+- `UserEngagement.jsx` - User activity metrics
+- `SubjectBreakdown.jsx` - Performance by subject
+- `ClassPerformanceChart.jsx` - Class-wide statistics
+- `InstructorPerformance.jsx` - Instructor effectiveness metrics
+- `QuestionStatistics.jsx` - Question-level analysis
+- `AssessmentDifficultyChart.jsx` - Difficulty distribution
+- `PlatformMetrics.jsx` - System-wide KPIs
+- `DateRangePicker.jsx` - Date range selection
+- `ExportButton.jsx` - Export charts/data
+- `ReportScheduler.jsx` - Automated report scheduling
+
+**Backend Routes**:
+- `GET /api/analytics/dashboard` - Dashboard statistics
+- `GET /api/analytics/performance` - Performance metrics
+- `GET /api/analytics/assessments` - Assessment analytics
+- `GET /api/analytics/users` - User engagement analytics
+- `GET /api/analytics/subjects` - Subject-wise breakdown
+- `POST /api/analytics/export` - Export analytics data
+- `POST /api/analytics/schedule-report` - Schedule automated reports
+
+**Admin Analytics**:
+- Platform-wide user statistics
+- Assessment creation trends
+- Submission rates
+- Average scores by subject/difficulty
+- Instructor performance comparison
+- Student engagement metrics
+- System usage patterns
+- Peak usage times
+- Storage and bandwidth usage
+
+**Instructor Analytics**:
+- Own assessment statistics
+- Student performance in own assessments
+- Question difficulty analysis
+- Time taken per question
+- Most/least difficult questions
+- Pass/fail rates
+- Class average comparisons
+- Individual student progress
+
+**Student Analytics**:
+- Personal performance trends
+- Score history
+- Strengths and weaknesses
+- Subject-wise performance
+- Comparison with class average
+- Time management analysis
+- Improvement suggestions
+- Rank/percentile (optional)
+
+**Report Features**:
+- **Date Range Selection**: Today, week, month, quarter, year, custom
+- **Export Formats**: PDF, CSV, Excel, JSON
+- **Scheduled Reports**: Daily, weekly, monthly email delivery
+- **Interactive Charts**: Hover tooltips, zoom, pan
+- **Filters**: By subject, difficulty, date range, user
+- **Print-Friendly**: Optimized for printing
+
+**Chart Types**:
+- Line charts (trends over time)
+- Bar charts (comparisons)
+- Pie charts (distributions)
+- Area charts (cumulative metrics)
+- Scatter plots (correlations)
+- Heatmaps (engagement patterns)
+
+---
+
+### 10. Platform Settings Module
+
+**Purpose**: System-wide configuration and customization
+
+**Components**:
+- `frontend/src/pages/admin/PlatformSettings.jsx` - Settings management interface
+
+**Backend Routes**:
+- `GET /api/admin/settings` - Get all settings
+- `PUT /api/admin/settings` - Update settings
+- `POST /api/admin/settings/reset` - Reset to defaults
+- `POST /api/admin/settings/backup` - Backup settings
+- `POST /api/admin/settings/restore` - Restore from backup
+
+**Settings Categories**:
+
+**1. General Settings**:
+- Platform name and tagline
+- Contact email
+- Support email
+- Default language
+- Timezone
+- Date/time format
+- Currency (if applicable)
+
+**2. Branding**:
+- Logo upload (header and favicon)
+- Primary color
+- Secondary color
+- Accent color
+- Custom CSS
+- Email template branding
+
+**3. Authentication**:
+- Enable/disable registration
+- Email verification required
+- Password minimum length
+- Password complexity requirements
+- Session timeout duration
+- Max login attempts
+- Lockout duration
+- Enable "Remember me"
+
+**4. Assessment Settings**:
+- Default assessment duration
+- Allow assessment retakes
+- Max retake attempts
+- Show correct answers after submission
+- Enable proctoring features
+- Auto-submit on time expiry
+- Grace period after deadline
+- Plagiarism detection threshold
+
+**5. Email Settings**:
+- SMTP host and port
+- SMTP username and password
+- From email and name
+- Enable email notifications
+- Email templates customization
+
+**6. Notification Settings**:
+- Enable in-app notifications
+- Enable email notifications
+- Enable SMS notifications (future)
+- Notification retention period
+- Polling frequency
+
+**7. Storage Settings**:
+- Max file upload size
+- Allowed file types
+- Storage quota per user
+- Auto-cleanup old files
+- Backup frequency
+
+**8. Security Settings**:
+- Enable rate limiting
+- Rate limit thresholds
+- Enable 2FA (two-factor authentication)
+- IP whitelist/blacklist
+- Enable activity logging
+- Log retention period
+- Enable CAPTCHA
+
+**9. API Settings**:
+- API rate limits
+- Enable API access
+- API key management
+- Webhook configurations
+
+---
+
+### 11. Assessment Management Module (Instructor)
+
+**Purpose**: Create, manage, and publish assessments
+
+**Components**:
+- `frontend/src/pages/instructor/CreateAssessment.jsx` - Assessment creation form
+- `frontend/src/pages/instructor/ManageAssessments.jsx` - Assessment list and management
+- `frontend/src/components/assessments/*` - Assessment-related components
+
+**Backend Routes**:
+- `GET /api/instructor/assessments` - List instructor's assessments
+- `POST /api/instructor/assessments` - Create assessment
+- `PUT /api/instructor/assessments/:id` - Update assessment
+- `DELETE /api/instructor/assessments/:id` - Delete assessment
+- `POST /api/instructor/assessments/:id/publish` - Publish assessment
+- `POST /api/instructor/assessments/:id/duplicate` - Duplicate assessment
+- `GET /api/instructor/assessments/:id/preview` - Preview assessment
+
+**Features**:
+- **Assessment Creation**:
+  - Basic info (title, description, subject)
+  - Duration and time limit
+  - Start date and deadline
+  - Passing marks
+  - Difficulty level
+  - Institute code (for targeting)
+  
+- **Question Types**:
+  - Multiple choice (single answer)
+  - Multiple choice (multiple answers)
+  - True/False
+  - Short answer
+  - Long answer/Essay
+  - Fill in the blanks
+  - Matching
+  - File upload
+
+- **Question Management**:
+  - Add/edit/delete questions
+  - Reorder questions (drag-and-drop)
+  - Set marks per question
+  - Add images to questions
+  - Add explanations (shown after submission)
+  - Question bank integration
+  - Import questions from CSV
+
+- **Assessment Settings**:
+  - Shuffle questions
+  - Shuffle options
+  - Show one question at a time
+  - Allow navigation (back/forward)
+  - Show timer
+  - Auto-submit on time expiry
+  - Allow late submissions
+  - Enable proctoring
+  - Restrict IP addresses
+
+- **Publishing**:
+  - Draft mode (save without publishing)
+  - Preview before publish
+  - Schedule for future date
+  - Notify students on publish
+  - Publish to specific institute codes
+
+- **Management Actions**:
+  - View submissions count
+  - View statistics
+  - Edit (if no submissions)
+  - Duplicate assessment
+  - Archive assessment
+  - Delete assessment (with confirmation)
+  - Unpublish (if needed)
+
+---
+
+### 12. Submission Evaluation Module (Instructor)
+
+**Purpose**: Grade and provide feedback on student submissions
+
+**Components**:
+- `frontend/src/pages/instructor/EvaluateSubmissions.jsx` - Evaluation interface
+- `frontend/src/components/submissions/*` - Submission components
+
+**Backend Routes**:
+- `GET /api/instructor/submissions` - List submissions for evaluation
+- `GET /api/instructor/submissions/:id` - Get submission details
+- `PUT /api/instructor/submissions/:id/grade` - Submit grades
+- `POST /api/instructor/submissions/:id/feedback` - Add feedback
+- `GET /api/instructor/submissions/pending` - Pending evaluations
+- `POST /api/instructor/submissions/bulk-grade` - Bulk grading
+
+**Features**:
+- **Submission List**:
+  - Filter by assessment
+  - Filter by student
+  - Filter by status (pending, graded, flagged)
+  - Sort by submission date
+  - Sort by student name
+  - Search by student name/email
+
+- **Evaluation Interface**:
+  - Side-by-side view (questions + answers)
+  - Question-by-question grading
+  - Auto-grading for MCQs and T/F
+  - Manual grading for subjective questions
+  - Add marks per question
+  - Add feedback comments
+  - Overall feedback section
+  - Flag for plagiarism/cheating
+
+- **Grading Features**:
+  - Total marks calculation
+  - Percentage calculation
+  - Pass/fail status
+  - Grade distribution (A, B, C, etc.)
+  - Partial marking
+  - Negative marking (optional)
+  - Bonus marks
+
+- **Feedback**:
+  - Question-level feedback
+  - Overall feedback
+  - Attach reference materials
+  - Private notes (not visible to student)
+  - Suggestions for improvement
+
+- **Bulk Actions**:
+  - Bulk grade similar answers
+  - Apply same feedback to multiple submissions
+  - Bulk approve/reject
+  - Export grades to CSV
+
+- **Analytics**:
+  - Class average
+  - Highest/lowest scores
+  - Difficult questions identification
+  - Time taken per student
+  - Submission timeline
+
+---
+
+### 13. Student Assessment Module
+
+**Purpose**: Browse, take, and track assessments
+
+**Components**:
+- `frontend/src/pages/student/BrowseAssessments.jsx` - Available assessments
+- `frontend/src/pages/student/AssessmentCatalog.jsx` - Assessment catalog
+- `frontend/src/pages/student/TakeTestPage.jsx` - Test-taking interface
+- `frontend/src/pages/student/TestInterface.jsx` - Main test UI
+- `frontend/src/pages/student/UpcomingTestsPage.jsx` - Upcoming assessments
+- `frontend/src/components/test/*` - Test-related components
+
+**Backend Routes**:
+- `GET /api/student/assessments` - Available assessments
+- `GET /api/student/assessments/:id` - Assessment details
+- `POST /api/student/assessments/:id/start` - Start assessment
+- `PUT /api/student/assessments/:id/submit` - Submit assessment
+- `POST /api/student/assessments/:id/save-progress` - Auto-save progress
+- `GET /api/student/assessments/:id/remaining-time` - Get remaining time
+
+**Features**:
+- **Browse Assessments**:
+  - List of available assessments
+  - Filter by subject
+  - Filter by status (upcoming, ongoing, completed)
+  - Search by title
+  - View assessment details
+  - Start assessment button
+
+- **Assessment Details**:
+  - Title and description
+  - Subject and difficulty
+  - Total questions and marks
+  - Duration
+  - Start date and deadline
+  - Attempts allowed
+  - Attempts used
+  - Best score (if multiple attempts)
+  - Instructions
+
+- **Test-Taking Interface**:
+  - **Navigation**:
+    - Question palette (overview)
+    - Previous/Next buttons
+    - Jump to question
+    - Flag questions for review
+    - Status indicators (answered, not answered, flagged)
+  
+  - **Timer**:
+    - Countdown timer
+    - Visual warnings (last 5 minutes)
+    - Auto-submit on time expiry
+  
+  - **Question Display**:
+    - Question text with formatting
+    - Question images (if any)
+    - Option selection (radio/checkbox)
+    - Text input (short/long answer)
+    - File upload area
+  
+  - **Features**:
+    - Auto-save every 30 seconds
+    - Save and exit (resume later)
+    - Warning before exit
+    - Confirmation before submit
+    - Review before submit
+  
+  - **Proctoring** (if enabled):
+    - Webcam feed
+    - Full-screen mode enforcement
+    - Tab switch detection
+    - Copy-paste prevention
+    - Right-click disabled
+
+- **After Submission**:
+  - Submission confirmation
+  - Estimated score (for MCQs)
+  - Feedback (if available)
+  - Correct answers (if enabled)
+  - Explanations
+  - View detailed results
+
+---
+
+### 14. Student Submissions Module
+
+**Purpose**: Track and view assessment submissions and results
+
+**Components**:
+- `frontend/src/pages/student/Submissions.jsx` - Submissions list
+- `frontend/src/pages/student/SubmissionsPage.jsx` - Submissions page
+- `frontend/src/pages/student/SubmissionDetailPage.jsx` - Detailed results
+- `frontend/src/components/submissions/*` - Submission components
+
+**Backend Routes**:
+- `GET /api/student/submissions` - List all submissions
+- `GET /api/student/submissions/:id` - Submission details
+- `GET /api/student/submissions/:id/feedback` - Instructor feedback
+- `GET /api/student/submissions/statistics` - Personal statistics
+
+**Features**:
+- **Submissions List**:
+  - Assessment title
+  - Submission date
+  - Score (marks/total)
+  - Percentage
+  - Status (pending, graded, passed, failed)
+  - Grade (A, B, C, etc.)
+  - View details button
+
+- **Submission Details**:
+  - Question-by-question review
+  - Your answer vs. correct answer
+  - Marks obtained per question
+  - Question-level feedback
+  - Overall feedback
+  - Strengths and weaknesses
+  - Time taken per question
+  - Total time taken
+
+- **Performance Metrics**:
+  - Score trend over time
+  - Subject-wise performance
+  - Comparison with class average
+  - Rank (if enabled)
+  - Percentile
+  - Improvement suggestions
+
+- **Actions**:
+  - Download certificate (if passed)
+  - Download result PDF
+  - Retake assessment (if allowed)
+  - View correct answers
+  - Request re-evaluation (if allowed)
+
+---
+
+### 15. Support & Help Module
+
+**Purpose**: Student-instructor-admin communication and help system
+
+**Components**:
+- `frontend/src/pages/StudentSupportPage.jsx` - Student support interface
+- `frontend/src/pages/InstructorSupportPage.jsx` - Instructor support interface
+- `frontend/src/pages/AdminSupportPage.jsx` - Admin support dashboard
+- `frontend/src/pages/StudentTicketDetailPage.jsx` - Ticket details (student)
+- `frontend/src/pages/InstructorTicketDetailPage.jsx` - Ticket details (instructor)
+- `frontend/src/pages/AdminTicketDetailPage.jsx` - Ticket details (admin)
+- `frontend/src/components/SupportDashboard.jsx` - Support dashboard
+- `frontend/src/components/CreateTicketModal.jsx` - Create ticket modal
+- `frontend/src/components/AssignTicketModal.jsx` - Assign ticket (admin)
+- `frontend/src/components/TicketList.jsx` - List of tickets
+- `frontend/src/components/TicketCard.jsx` - Individual ticket card
+- `frontend/src/components/TicketDetails.jsx` - Detailed ticket view
+- `frontend/src/components/TicketFilters.jsx` - Filter tickets
+
+**Backend Routes**:
+- `GET /api/support/tickets` - List tickets (filtered by role)
+- `POST /api/support/tickets` - Create ticket
+- `GET /api/support/tickets/:id` - Get ticket details
+- `PUT /api/support/tickets/:id` - Update ticket
+- `PATCH /api/support/tickets/:id/status` - Change status
+- `POST /api/support/tickets/:id/assign` - Assign to admin/instructor
+- `POST /api/support/tickets/:id/comment` - Add comment
+- `GET /api/support/categories` - Get ticket categories
+
+**Features**:
+- **Ticket Creation**:
+  - Subject and description
+  - Category (technical, assessment, account, general)
+  - Priority (low, normal, high, urgent)
+  - Attach files (screenshots, documents)
+  - Related assessment (optional)
+
+- **Ticket Management**:
+  - Ticket ID and title
+  - Status (open, in progress, resolved, closed)
+  - Priority badge
+  - Created date
+  - Last updated
+  - Assigned to (admin/instructor name)
+  - Number of comments
+
+- **Ticket Details**:
+  - Full description
+  - Attachments
+  - Comment thread
+  - Status history
+  - Assignment history
+  - Action buttons (close, reopen, escalate)
+
+- **Comments**:
+  - Add comment
+  - Attach files
+  - Mark as internal (admin/instructor only)
+  - Real-time updates
+  - Email notifications on new comments
+
+- **Filters**:
+  - By status
+  - By priority
+  - By category
+  - By assigned user
+  - By date range
+  - Search by title/description
+
+**Role-Specific Features**:
+- **Student**: Create tickets, view own tickets, add comments, close resolved tickets
+- **Instructor**: View assigned tickets, respond to student queries, escalate to admin
+- **Admin**: View all tickets, assign tickets, manage categories, view statistics
+
+---
+
+### 16. Chat Module
+
+**Purpose**: Real-time messaging between users
+
+**Components**:
+- `frontend/src/components/ChatWindow.jsx` - Chat interface
+- `frontend/src/components/MessageBubble.jsx` - Individual message
+- `frontend/src/components/MessageInput.jsx` - Message input box
+- `frontend/src/components/TypingIndicator.jsx` - "User is typing..." indicator
+- `frontend/src/components/FilePreview.jsx` - File attachment preview
+
+**Backend Routes**:
+- `GET /api/chat/conversations` - List conversations
+- `GET /api/chat/messages/:conversationId` - Get messages
+- `POST /api/chat/messages` - Send message
+- `POST /api/chat/messages/file` - Upload file attachment
+- `PATCH /api/chat/messages/:id/read` - Mark as read
+- `WebSocket: /socket.io` - Real-time messaging
+
+**Features**:
+- **Conversation List**:
+  - Recent conversations
+  - Unread message badge
+  - Last message preview
+  - Timestamp
+  - User avatar
+
+- **Chat Interface**:
+  - Message history
+  - Real-time message delivery
+  - Message status (sent, delivered, read)
+  - Typing indicator
+  - File attachments (images, PDFs, docs)
+  - Emoji support
+  - Link previews
+
+- **Message Features**:
+  - Text messages
+  - File upload (max 10MB)
+  - Image preview
+  - Voice messages (future)
+  - Delete message
+  - Edit message (within 5 minutes)
+  - Reply to message
+  - Forward message
+
+- **Real-Time Features**:
+  - WebSocket-based instant messaging
+  - Typing indicators
+  - Online/offline status
+  - Read receipts
+  - Push notifications (browser)
+
+**Use Cases**:
+- Student-instructor communication
+- Assignment clarifications
+- Support ticket discussions
+- Group discussions (future)
+- Announcements
+
+---
+
+### 17. Search Module
+
+**Purpose**: Global platform search functionality
+
+**Components**:
+- `frontend/src/pages/SearchResultsPage.jsx` - Search results page
+- `frontend/src/components/common/GlobalSearchBar.jsx` - Search bar component
+
+**Backend Routes**:
+- `GET /api/search` - Global search
+- `GET /api/search/assessments` - Search assessments
+- `GET /api/search/users` - Search users (admin only)
+- `GET /api/search/submissions` - Search submissions
+- `GET /api/search/tickets` - Search support tickets
+
+**Features**:
+- **Search Capabilities**:
+  - Full-text search across multiple entities
+  - Search assessments by title/description/subject
+  - Search users by name/email (admin)
+  - Search submissions
+  - Search support tickets
+  - Search announcements
+  - Search notifications
+
+- **Search Filters**:
+  - Filter by type (assessments, users, tickets, etc.)
+  - Date range
+  - Status filters
+  - Role filters (admin search)
+
+- **Results Display**:
+  - Grouped by type
+  - Relevance sorting
+  - Highlight matched terms
+  - Quick preview
+  - Direct links to resources
+
+- **Advanced Search**:
+  - Exact phrase matching
+  - Exclude terms
+  - Wildcard search
+  - Boolean operators (AND, OR, NOT)
+
+---
+
+### 18. Profile Management Module
+
+**Purpose**: User profile viewing and editing
+
+**Components**:
+- `frontend/src/pages/student/Profile.jsx` - Profile view
+- `frontend/src/pages/student/ProfilePage.jsx` - Profile page
+- `frontend/src/components/profile/*` - Profile components
+
+**Backend Routes**:
+- `GET /api/profile` - Get user profile
+- `PUT /api/profile` - Update profile
+- `POST /api/profile/avatar` - Upload avatar
+- `PUT /api/profile/password` - Change password
+- `GET /api/profile/activity` - Activity history
+
+**Features**:
+- **Profile Information**:
+  - Name
+  - Email
+  - Role
+  - Institute code
+  - Avatar/profile picture
+  - Bio/description
+  - Contact information
+  - Social media links (optional)
+
+- **Editable Fields**:
+  - Name
+  - Avatar image
+  - Bio
+  - Contact number
+  - Preferences
+  - Notification settings
+
+- **Account Security**:
+  - Change password
+  - View active sessions
+  - Logout all devices
+  - Enable 2FA (if available)
+
+- **Activity**:
+  - Recent logins
+  - Recent submissions
+  - Recent assessments taken
+  - Activity timeline
+
+---
+
+### 19. Settings Module
+
+**Purpose**: User-specific settings and preferences
+
+**Components**:
+- `frontend/src/pages/student/SettingsPage.jsx` - Settings interface
+
+**Backend Routes**:
+- `GET /api/settings` - Get user settings
+- `PUT /api/settings` - Update settings
+- `POST /api/settings/reset` - Reset to defaults
+
+**Features**:
+- **Appearance**:
+  - Theme (light/dark/system)
+  - Color scheme
+  - Font size
+  - Compact mode
+
+- **Notifications**:
+  - Email notifications (enable/disable)
+  - In-app notifications
+  - Assessment reminders
+  - Grade notifications
+  - Announcement notifications
+
+- **Privacy**:
+  - Show profile to others
+  - Show rank/percentile
+  - Share statistics
+  - Activity visibility
+
+- **Language & Region**:
+  - Preferred language
+  - Timezone
+  - Date format
+  - Number format
+
+- **Accessibility**:
+  - Screen reader support
+  - High contrast mode
+  - Keyboard shortcuts
+  - Text-to-speech
+
+---
+
+### 20. Help & Documentation Module
+
+**Purpose**: Self-service help resources and documentation
+
+**Components**:
+- `frontend/src/pages/student/HelpSupportPage.jsx` - Help center
+
+**Backend Routes**:
+- `GET /api/help/articles` - List help articles
+- `GET /api/help/articles/:id` - Get article content
+- `POST /api/help/articles/:id/helpful` - Mark as helpful
+- `GET /api/help/search` - Search help articles
+- `GET /api/help/categories` - Get categories
+
+**Features**:
+- **Help Categories**:
+  - Getting Started
+  - Taking Assessments
+  - Viewing Results
+  - Account Management
+  - Troubleshooting
+  - FAQs
+
+- **Help Articles**:
+  - Step-by-step guides
+  - Video tutorials
+  - Screenshots
+  - Best practices
+  - Tips and tricks
+
+- **Search**:
+  - Search help articles
+  - Suggested articles
+  - Related articles
+  - Popular articles
+
+- **Feedback**:
+  - Was this helpful? (Yes/No)
+  - Report incorrect information
+  - Suggest improvements
+
+---
+
 ## 🚀 Recent Features Implemented
 
 ### 1. Bulk CSV User Import Feature
