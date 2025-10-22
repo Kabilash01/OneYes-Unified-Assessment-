@@ -1,5 +1,7 @@
 const User = require('../models/User');
+const PasswordReset = require('../models/PasswordReset');
 const { generateToken } = require('../utils/tokenGenerator');
+const emailService = require('../services/emailService');
 
 /**
  * @route   POST /api/auth/register
@@ -189,10 +191,185 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset
+ * @access  Public
+ */
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an email address',
+      });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!user) {
+      // Don't reveal if user exists or not (security best practice)
+      return res.status(200).json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.',
+      });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Your account has been deactivated. Please contact administrator.',
+      });
+    }
+
+    // Invalidate any existing tokens for this user
+    await PasswordReset.invalidateUserTokens(user._id);
+
+    // Create new password reset request
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.get('user-agent') || 'Unknown';
+    
+    const resetRequest = await PasswordReset.createResetRequest(
+      user._id,
+      user.email,
+      ipAddress,
+      userAgent
+    );
+
+    // Send password reset email
+    try {
+      await emailService.sendPasswordResetEmail(
+        user.email,
+        user.name,
+        resetRequest.token
+      );
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError);
+      // Continue anyway - don't expose email sending errors
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'If an account with that email exists, a password reset link has been sent.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/verify-reset-token
+ * @desc    Verify password reset token validity
+ * @access  Public
+ */
+const verifyResetToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reset token is required',
+      });
+    }
+
+    // Verify token
+    const resetRequest = await PasswordReset.verifyToken(token);
+
+    if (!resetRequest) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Token is valid',
+      data: {
+        email: resetRequest.email,
+        userId: resetRequest.userId._id,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Reset password with token
+ * @access  Public
+ */
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and new password are required',
+      });
+    }
+
+    // Verify token
+    const resetRequest = await PasswordReset.verifyToken(token);
+
+    if (!resetRequest) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      });
+    }
+
+    // Get user
+    const user = await User.findById(resetRequest.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'Your account has been deactivated. Please contact administrator.',
+      });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    // Mark token as used
+    await resetRequest.markAsUsed();
+
+    // Invalidate all other tokens for this user
+    await PasswordReset.invalidateUserTokens(user._id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully. You can now login with your new password.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  verifyResetToken,
+  resetPassword,
 };

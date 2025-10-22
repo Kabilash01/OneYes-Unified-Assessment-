@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Support Ticket</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .ticket-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .ticket-info h2 {
+      margin-top: 0;
+      color: #667eea;
+      font-size: 20px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .label {
+      font-weight: 600;
+      color: #666;
+    }
+    .value {
+      color: #333;
+      text-align: right;
+    }
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .priority-low {
+      background-color: #d1f2eb;
+      color: #0c5460;
+    }
+    .priority-medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .priority-high {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .priority-urgent {
+      background-color: #d93025;
+      color: white;
+    }
+    .message-box {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+      font-style: italic;
+      color: #555;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      margin: 20px 0;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 14px;
+      background-color: #f8f9fa;
+    }
+    .user-info {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎫 New Support Ticket</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.9;">A new support request requires your attention</p>
+    </div>
+    
+    <div class="content">
+      <p>Hello <strong>{{adminName}}</strong>,</p>
+      
+      <p>A new support ticket has been created and needs to be reviewed:</p>
+      
+      <div class="ticket-info">
+        <h2>Ticket Details</h2>
+        <div class="info-row">
+          <span class="label">Ticket Number:</span>
+          <span class="value"><strong>{{ticketNumber}}</strong></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Title:</span>
+          <span class="value">{{title}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Category:</span>
+          <span class="value">{{subject}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Priority:</span>
+          <span class="value">
+            <span class="priority-badge priority-{{priority}}">{{priority}}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="user-info">
+        <strong>Submitted by:</strong><br>
+        {{userName}}<br>
+        {{userEmail}}
+      </div>
+
+      <div class="message-box">
+        <strong>Message:</strong><br>
+        {{message}}
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{platformUrl}}/admin/support/{{ticketId}}" class="cta-button">
+          View Ticket
+        </a>
+      </div>
+
+      <p style="margin-top: 30px; color: #666; font-size: 14px;">
+        Please review this ticket and assign it to the appropriate team member as soon as possible.
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated notification from the Unified Assessment Platform.</p>
+      <p style="margin-top: 10px;">
+        <a href="{{platformUrl}}" style="color: #667eea;">Visit Platform</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

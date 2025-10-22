@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import { SidebarProvider } from './context/SidebarContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { ProtectedRoute, RoleBasedRoute, PublicRoute } from './components/ProtectedRoute';
 
 // Common Components
@@ -11,6 +12,8 @@ import Navbar from './components/common/Navbar';
 // Auth Components
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 // Student Components
 import StudentDashboard from './pages/student/Dashboard';
@@ -29,17 +32,37 @@ import HelpSupportPage from './pages/student/HelpSupportPage';
 import TakeTestPage from './pages/student/TakeTestPage';
 import SubmissionsPage from './pages/student/SubmissionsPage';
 import SubmissionDetailPage from './pages/student/SubmissionDetailPage';
+import StudentSupportPage from './pages/StudentSupportPage';
+import StudentTicketDetailPage from './pages/StudentTicketDetailPage';
+
+// Analytics Components (Feature 7)
+import StudentAnalyticsDashboard from './pages/student/StudentAnalyticsDashboard';
+import InstructorAnalyticsDashboard from './pages/instructor/InstructorAnalyticsDashboard';
+import AdminAnalyticsDashboard from './pages/admin/AdminAnalyticsDashboard';
 
 // Instructor Components (placeholders)
 import InstructorDashboard from './pages/instructor/Dashboard';
 import CreateAssessment from './pages/instructor/CreateAssessment';
 import ManageAssessments from './pages/instructor/ManageAssessments';
 import EvaluateSubmissions from './pages/instructor/EvaluateSubmissions';
+import EvaluationCalendar from './pages/instructor/EvaluationCalendar';
+import InstructorSupportPage from './pages/InstructorSupportPage';
+import InstructorTicketDetailPage from './pages/InstructorTicketDetailPage';
 
-// Admin Components (placeholders)
-import AdminDashboard from './pages/admin/Dashboard';
+// Admin Components
+import AdminDashboard from './pages/admin/AdminDashboard';
+import DashboardOverview from './components/admin/DashboardOverview';
 import UserManagement from './pages/admin/UserManagement';
 import AssessmentOversight from './pages/admin/AssessmentOversight';
+import ActivityLogs from './pages/admin/ActivityLogs';
+import PlatformSettings from './pages/admin/PlatformSettings';
+import SuspiciousAlerts from './components/admin/SuspiciousAlerts';
+import AdminNotificationsPage from './pages/admin/NotificationsPage';
+import AnnouncementsPage from './pages/admin/AnnouncementsPage';
+import ActivityCalendar from './pages/admin/ActivityCalendar';
+import SearchResultsPage from './pages/SearchResultsPage';
+import AdminSupportPage from './pages/AdminSupportPage';
+import AdminTicketDetailPage from './pages/AdminTicketDetailPage';
 
 // Landing Page
 import LandingPage from './pages/LandingPage';
@@ -48,8 +71,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <SidebarProvider>
-          <Routes>
+        <NotificationProvider>
+          <SidebarProvider>
+            <Routes>
             {/* Public Routes */}
             <Route
               path="/"
@@ -73,6 +97,32 @@ function App() {
                 <PublicRoute>
                   <Signup />
                 </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
+                </PublicRoute>
+              }
+            />
+
+            {/* Search Results - Protected Route for all authenticated users */}
+            <Route
+              path="/search-results"
+              element={
+                <ProtectedRoute>
+                  <SearchResultsPage />
+                </ProtectedRoute>
               }
             />
 
@@ -205,6 +255,30 @@ function App() {
                 </RoleBasedRoute>
               }
             />
+            <Route
+              path="/student/support"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <StudentSupportPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/support/:id"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <StudentTicketDetailPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/student/analytics"
+              element={
+                <RoleBasedRoute allowedRoles={['student']}>
+                  <StudentAnalyticsDashboard />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Instructor Routes */}
             <Route
@@ -239,31 +313,72 @@ function App() {
                 </RoleBasedRoute>
               }
             />
+            <Route
+              path="/instructor/calendar"
+              element={
+                <RoleBasedRoute allowedRoles={['instructor']}>
+                  <EvaluationCalendar />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/instructor/support"
+              element={
+                <RoleBasedRoute allowedRoles={['instructor']}>
+                  <InstructorSupportPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/instructor/support/:id"
+              element={
+                <RoleBasedRoute allowedRoles={['instructor']}>
+                  <InstructorTicketDetailPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/instructor/analytics"
+              element={
+                <RoleBasedRoute allowedRoles={['instructor']}>
+                  <InstructorAnalyticsDashboard />
+                </RoleBasedRoute>
+              }
+            />
 
             {/* Admin Routes */}
             <Route
-              path="/admin/dashboard"
+              path="/admin-dashboard"
               element={
                 <RoleBasedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
                 </RoleBasedRoute>
               }
-            />
+            >
+              {/* Nested Admin Routes */}
+              <Route index element={<DashboardOverview />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="assessments" element={<AssessmentOversight />} />
+              <Route path="logs" element={<ActivityLogs />} />
+              <Route path="alerts" element={<SuspiciousAlerts />} />
+              <Route path="notifications" element={<AdminNotificationsPage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
+              <Route path="calendar" element={<ActivityCalendar />} />
+              <Route path="settings" element={<PlatformSettings />} />
+              <Route path="support" element={<AdminSupportPage />} />
+              <Route path="support/:id" element={<AdminTicketDetailPage />} />
+              <Route path="analytics" element={<AdminAnalyticsDashboard />} />
+            </Route>
+
+            {/* Legacy Admin Routes (redirect to new structure) */}
+            <Route path="/admin/dashboard" element={<Navigate to="/admin-dashboard" replace />} />
             <Route
               path="/admin/users"
-              element={
-                <RoleBasedRoute allowedRoles={['admin']}>
-                  <UserManagement />
-                </RoleBasedRoute>
-              }
+              element={<Navigate to="/admin-dashboard/users" replace />}
             />
             <Route
               path="/admin/assessments"
-              element={
-                <RoleBasedRoute allowedRoles={['admin']}>
-                  <AssessmentOversight />
-                </RoleBasedRoute>
-              }
+              element={<Navigate to="/admin-dashboard/assessments" replace />}
             />
 
             {/* 404 Page */}
@@ -283,7 +398,8 @@ function App() {
             pauseOnHover
             theme="colored"
           />
-        </SidebarProvider>
+          </SidebarProvider>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );

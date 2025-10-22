@@ -392,7 +392,7 @@ userSchema.methods.toPublicJSON = function () {
 };
 
 // Indexes for better query performance
-userSchema.index({ email: 1 });
+// Note: email index is created automatically by unique: true in schema
 userSchema.index({ role: 1, isActive: 1 });
 
 module.exports = mongoose.model('User', userSchema);

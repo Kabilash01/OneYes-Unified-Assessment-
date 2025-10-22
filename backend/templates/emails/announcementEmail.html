@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      line-height: 1.6; 
+      color: #333; 
+      margin: 0; 
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 20px auto; 
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white; 
+      padding: 30px 20px; 
+      text-align: center; 
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .header .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .content { 
+      padding: 30px 20px; 
+      background: #ffffff; 
+    }
+    .content h2 {
+      color: #667eea;
+      margin-top: 0;
+      font-size: 22px;
+    }
+    .message-box {
+      background: #f9fafb;
+      border-radius: 6px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #e5e7eb;
+    }
+    .meta-info {
+      background: #EEF2FF;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .meta-info p {
+      margin: 5px 0;
+    }
+    .footer { 
+      text-align: center; 
+      padding: 20px; 
+      background: #f9fafb;
+      color: #666; 
+      font-size: 12px; 
+      border-top: 1px solid #e5e7eb;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="icon">📢</div>
+      <h1>{{announcementTitle}}</h1>
+    </div>
+    <div class="content">
+      <div class="message-box">
+        {{announcementMessage}}
+      </div>
+
+      <div class="meta-info">
+        <p><strong>📌 From:</strong> Platform Administrator</p>
+        <p><strong>📅 Date:</strong> {{date}}</p>
+        {{#if priority}}
+        <p><strong>⚠️ Priority:</strong> {{priority}}</p>
+        {{/if}}
+      </div>
+
+      <p style="color: #666; font-size: 14px; margin-top: 30px;">
+        This announcement was sent to you as part of {{instituteName}}'s platform communications.
+      </p>
+    </div>
+    <div class="footer">
+      <p>&copy; 2025 {{instituteName}}. All rights reserved.</p>
+      <p>This is an automated announcement email.</p>
+    </div>
+  </div>
+</body>
+</html>

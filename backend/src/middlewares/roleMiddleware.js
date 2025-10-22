@@ -25,4 +25,12 @@ const roleMiddleware = (...roles) => {
   };
 };
 
+// Convenience middleware for specific roles
+const adminAuth = roleMiddleware('admin');
+const instructorAuth = roleMiddleware('instructor', 'admin');
+const studentAuth = roleMiddleware('student');
+
 module.exports = roleMiddleware;
+module.exports.adminAuth = adminAuth;
+module.exports.instructorAuth = instructorAuth;
+module.exports.studentAuth = studentAuth;

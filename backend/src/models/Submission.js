@@ -146,13 +146,11 @@ submissionSchema.virtual('timeTaken').get(function () {
 });
 
 // Indexes for better query performance
-submissionSchema.index({ assessmentId: 1, studentId: 1 });
+// Unique compound index for assessmentId + studentId (ensures one submission per student per assessment)
+submissionSchema.index({ assessmentId: 1, studentId: 1 }, { unique: true });
 submissionSchema.index({ studentId: 1, status: 1 });
 submissionSchema.index({ assessmentId: 1, status: 1 });
 submissionSchema.index({ evaluatedBy: 1 });
-
-// Ensure only one submission per student per assessment
-submissionSchema.index({ assessmentId: 1, studentId: 1 }, { unique: true });
 
 // Ensure virtuals are included in JSON
 submissionSchema.set('toJSON', { virtuals: true });

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Assigned</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .content {
+      padding: 30px;
+    }
+    .ticket-card {
+      background-color: #f8f9fa;
+      border-left: 4px solid #7b2cbf;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .ticket-card h2 {
+      margin-top: 0;
+      color: #7b2cbf;
+      font-size: 20px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .info-item {
+      background-color: white;
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #e0e0e0;
+    }
+    .info-label {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .priority-low {
+      background-color: #d1f2eb;
+      color: #0c5460;
+    }
+    .priority-medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .priority-high {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .priority-urgent {
+      background-color: #d93025;
+      color: white;
+    }
+    .user-box {
+      background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .user-box strong {
+      font-size: 18px;
+      color: #5a189a;
+    }
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
+      color: white;
+      text-decoration: none;
+      padding: 14px 35px;
+      border-radius: 25px;
+      margin: 20px 0;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+    .action-reminder {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 14px;
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📋 Ticket Assigned to You</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.9;">You have a new support ticket to handle</p>
+    </div>
+    
+    <div class="content">
+      <p>Hello <strong>{{assigneeName}}</strong>,</p>
+      
+      <p>A support ticket has been assigned to you. Please review and respond as soon as possible.</p>
+      
+      <div class="ticket-card">
+        <h2>{{title}}</h2>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Ticket Number</div>
+            <div class="info-value">{{ticketNumber}}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Category</div>
+            <div class="info-value">{{subject}}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Priority</div>
+            <div class="info-value">
+              <span class="priority-badge priority-{{priority}}">{{priority}}</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Status</div>
+            <div class="info-value">Open</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-box">
+        <div class="info-label">Submitted by</div>
+        <strong>{{userName}}</strong>
+      </div>
+
+      <div class="action-reminder">
+        <strong>⏰ Action Required:</strong><br>
+        Please review this ticket and provide a response to the user. High and urgent priority tickets should be addressed within 24 hours.
+      </div>
+
+      <div style="text-align: center;">
+        <a href="{{platformUrl}}/instructor/support/{{ticketId}}" class="cta-button">
+          View & Respond to Ticket
+        </a>
+      </div>
+
+      <p style="margin-top: 30px; color: #666; font-size: 14px;">
+        You can view all your assigned tickets in your support dashboard.
+      </p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated notification from the Unified Assessment Platform.</p>
+      <p style="margin-top: 10px;">
+        <a href="{{platformUrl}}" style="color: #7b2cbf;">Visit Platform</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

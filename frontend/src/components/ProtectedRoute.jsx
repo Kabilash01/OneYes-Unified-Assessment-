@@ -45,7 +45,7 @@ export const RoleBasedRoute = ({ children, allowedRoles }) => {
     // Redirect to appropriate dashboard based on role
     if (user?.role === 'student') return <Navigate to="/student/dashboard" replace />;
     if (user?.role === 'instructor') return <Navigate to="/instructor/dashboard" replace />;
-    if (user?.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (user?.role === 'admin') return <Navigate to="/admin-dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 
@@ -68,7 +68,7 @@ export const PublicRoute = ({ children }) => {
     // Redirect to role-specific dashboard
     if (user?.role === 'student') return <Navigate to="/student/dashboard" replace />;
     if (user?.role === 'instructor') return <Navigate to="/instructor/dashboard" replace />;
-    if (user?.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+    if (user?.role === 'admin') return <Navigate to="/admin-dashboard" replace />;
   }
 
   return children;

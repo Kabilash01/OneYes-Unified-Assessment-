@@ -1,321 +1,376 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import { format, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
-import { studentAPI } from '../../services/api';
-import { useToast } from '../../hooks/useToast';
-import { formatDate, formatDuration } from '../../utils/helpers';
-import Button from '../../components/common/Button';
-import Card from '../../components/common/Card';
-import Badge from '../../components/common/Badge';
-import { Spinner } from '../../components/common/Loader';
+import { useAuth } from '../../context/AuthContext';
+import useCalendar from '../../hooks/useCalendar';
+import CalendarView from '../../components/common/CalendarView';
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Filter,
+  Search,
+  X,
+  AlertCircle,
+} from 'lucide-react';
 
-/**
- * AssessmentCalendar Component
- * @description Calendar view of assessments with color-coded dates
- */
 const AssessmentCalendar = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const toast = useToast();
+  const {
+    currentDate,
+    view,
+    events,
+    loading,
+    error,
+    summary,
+    filters,
+    goToToday,
+    goToPrevious,
+    goToNext,
+    changeView,
+    updateFilters,
+    exportToICal,
+    getPeriodLabel,
+  } = useCalendar('student', user?._id);
 
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [assessments, setAssessments] = useState([]);
-  const [selectedDateAssessments, setSelectedDateAssessments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [view, setView] = useState('month'); // month, week, day
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [uniqueSubjects, setUniqueSubjects] = useState([]);
+
+  // Extract unique subjects from events
+  useEffect(() => {
+    const subjects = [...new Set(events.map((e) => e.subject).filter(Boolean))];
+    setUniqueSubjects(subjects);
+  }, [events]);
+
+  // Filter events by search query
+  const filteredEvents = events.filter((event) =>
+    searchQuery
+      ? event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.subject?.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  );
 
   /**
-   * Fetch assessments for calendar
+   * Handle event click - navigate to assessment
    */
-  const fetchCalendarData = async (date = currentDate) => {
-    setLoading(true);
-    try {
-      const response = await studentAPI.getAssessmentCalendar({
-        month: date.getMonth() + 1,
-        year: date.getFullYear(),
-      });
-      setAssessments(response.data.assessments || []);
-    } catch (error) {
-      toast.error(error.message || 'Failed to load calendar data');
-    } finally {
-      setLoading(false);
+  const handleEventClick = (event) => {
+    if (event.type === 'assessment') {
+      navigate(`/student/assessments/${event.id}`);
     }
   };
 
-  useEffect(() => {
-    fetchCalendarData();
-  }, [currentDate]);
-
   /**
-   * Handle date change
+   * Handle export to iCal
    */
-  const handleDateChange = (date) => {
-    setCurrentDate(date);
-    // Filter assessments for selected date
-    const filtered = assessments.filter(assessment => {
-      const startDate = new Date(assessment.startDate);
-      const endDate = new Date(assessment.endDate);
-      return date >= startDate && date <= endDate;
-    });
-    setSelectedDateAssessments(filtered);
+  const handleExport = async () => {
+    const result = await exportToICal();
+    if (result.success) {
+      alert('Calendar exported successfully!');
+    } else {
+      alert('Failed to export calendar');
+    }
   };
 
-  /**
-   * Handle month change
-   */
-  const handleActiveStartDateChange = ({ activeStartDate }) => {
-    setCurrentDate(activeStartDate);
-  };
-
-  /**
-   * Get tile color based on assessments
-   */
-  const getTileClassName = ({ date, view }) => {
-    if (view !== 'month') return '';
-
-    const dayAssessments = assessments.filter(assessment => {
-      const startDate = new Date(assessment.startDate);
-      const endDate = new Date(assessment.endDate);
-      return date >= startDate && date <= endDate;
-    });
-
-    if (dayAssessments.length === 0) return '';
-
-    // Determine priority color
-    const hasAvailable = dayAssessments.some(a => a.status === 'available');
-    const hasDeadlineSoon = dayAssessments.some(a => a.status === 'deadline-soon');
-    const hasStartingSoon = dayAssessments.some(a => a.status === 'starting-soon');
-    const hasExpired = dayAssessments.some(a => a.status === 'expired');
-    const hasCompleted = dayAssessments.some(a => a.status === 'completed');
-
-    if (hasDeadlineSoon) return 'calendar-deadline-soon';
-    if (hasAvailable) return 'calendar-available';
-    if (hasStartingSoon) return 'calendar-starting-soon';
-    if (hasCompleted) return 'calendar-completed';
-    if (hasExpired) return 'calendar-expired';
-    return 'calendar-upcoming';
-  };
-
-  /**
-   * Get tile content (show assessment count)
-   */
-  const getTileContent = ({ date, view }) => {
-    if (view !== 'month') return null;
-
-    const dayAssessments = assessments.filter(assessment => {
-      const startDate = new Date(assessment.startDate);
-      const endDate = new Date(assessment.endDate);
-      return date >= startDate && date <= endDate;
-    });
-
-    if (dayAssessments.length === 0) return null;
-
+  if (loading && events.length === 0) {
     return (
-      <div className="flex justify-center items-center">
-        <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-white bg-primary-600 rounded-full">
-          {dayAssessments.length}
-        </span>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading calendar...</p>
+        </div>
       </div>
     );
-  };
-
-  /**
-   * Get next assessment countdown
-   */
-  const getNextAssessment = () => {
-    const now = new Date();
-    const upcoming = assessments
-      .filter(a => new Date(a.startDate) > now)
-      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    
-    return upcoming[0] || null;
-  };
-
-  const nextAssessment = getNextAssessment();
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <div className="mb-8">
+      <div className="bg-white border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+              <CalendarIcon className="mr-3 text-blue-600" size={28} />
               Assessment Calendar
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              View upcoming assessments in calendar format
+            <p className="text-sm text-gray-600 mt-1">
+              View and manage your upcoming assessments
             </p>
           </div>
-          <Button variant="outline" onClick={() => navigate('/student/assessments')}>
-            📋 List View
-          </Button>
-        </div>
-      </div>
 
-      {/* Next Assessment Countdown */}
-      {nextAssessment && (
-        <Card className="mb-6 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 border-primary-200 dark:border-primary-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-primary-900 dark:text-primary-100 mb-1">
-                Next Assessment: {nextAssessment.title}
-              </h3>
-              <p className="text-primary-700 dark:text-primary-300">
-                Starts on {formatDate(nextAssessment.startDate, true)}
-              </p>
-            </div>
-            <Button
-              variant="primary"
-              onClick={() => navigate(`/student/test/${nextAssessment._id}`)}
-            >
-              View Details
-            </Button>
-          </div>
-        </Card>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendar */}
-        <div className="lg:col-span-2">
-          <Card>
-            {loading ? (
-              <div className="flex justify-center items-center h-96">
-                <Spinner size="lg" />
+          {/* Summary Stats */}
+          {summary && (
+            <div className="flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">{summary.total}</div>
+                <div className="text-xs text-gray-600">Total</div>
               </div>
-            ) : (
-              <>
-                <Calendar
-                  onChange={handleDateChange}
-                  value={currentDate}
-                  onActiveStartDateChange={handleActiveStartDateChange}
-                  tileClassName={getTileClassName}
-                  tileContent={getTileContent}
-                  className="w-full border-none shadow-none"
-                />
-
-                {/* Legend */}
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                    Status Legend
-                  </h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <LegendItem color="green" label="Available Now" />
-                    <LegendItem color="yellow" label="Starting Soon" />
-                    <LegendItem color="gray" label="Upcoming" />
-                    <LegendItem color="orange" label="Deadline Soon" />
-                    <LegendItem color="red" label="Expired" />
-                    <LegendItem color="blue" label="Completed" />
-                  </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-orange-600">{summary.pending}</div>
+                <div className="text-xs text-gray-600">Pending</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">{summary.submitted}</div>
+                <div className="text-xs text-gray-600">Submitted</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{summary.evaluated}</div>
+                <div className="text-xs text-gray-600">Evaluated</div>
+              </div>
+              {summary.overdue > 0 && (
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-600">{summary.overdue}</div>
+                  <div className="text-xs text-gray-600">Overdue</div>
                 </div>
-              </>
-            )}
-          </Card>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Controls Bar */}
+      <div className="bg-white border-b px-6 py-3">
+        <div className="flex items-center justify-between">
+          {/* Navigation */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={goToPrevious}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Previous"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            <button
+              onClick={goToToday}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Today
+            </button>
+
+            <button
+              onClick={goToNext}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Next"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            <div className="text-lg font-semibold text-gray-900 ml-4">
+              {getPeriodLabel()}
+            </div>
+          </div>
+
+          {/* View Toggle & Actions */}
+          <div className="flex items-center space-x-3">
+            {/* Search */}
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search assessments..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              />
+            </div>
+
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center ${
+                showFilters ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <Filter size={18} className="mr-2" />
+              Filters
+            </button>
+
+            {/* View Toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => changeView('month')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  view === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600'
+                }`}
+              >
+                Month
+              </button>
+              <button
+                onClick={() => changeView('week')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  view === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600'
+                }`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => changeView('day')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  view === 'day' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600'
+                }`}
+              >
+                Day
+              </button>
+            </div>
+
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center"
+              title="Export to Google Calendar / iCal"
+            >
+              <Download size={18} className="mr-2" />
+              Export
+            </button>
+          </div>
         </div>
 
-        {/* Selected Date Assessments */}
-        <div>
-          <Card>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {selectedDateAssessments.length > 0
-                ? `Assessments on ${format(currentDate, 'MMM d, yyyy')}`
-                : 'Select a date'}
-            </h3>
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-900">Filters</h3>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="p-1 hover:bg-gray-200 rounded transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-            {selectedDateAssessments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <svg
-                  className="w-16 h-16 mx-auto mb-4 opacity-50"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="grid grid-cols-3 gap-4">
+              {/* Subject Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Subject
+                </label>
+                <select
+                  value={filters.subject}
+                  onChange={(e) => updateFilters({ subject: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <p>No assessments on this date</p>
+                  <option value="all">All Subjects</option>
+                  {uniqueSubjects.map((subject) => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {selectedDateAssessments.map((assessment) => (
-                  <AssessmentMiniCard
-                    key={assessment._id}
-                    assessment={assessment}
-                    onClick={() => navigate(`/student/test/${assessment._id}`)}
-                  />
-                ))}
+
+              {/* Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  value={filters.status}
+                  onChange={(e) => updateFilters({ status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="submitted">Submitted</option>
+                  <option value="evaluated">Evaluated</option>
+                </select>
+              </div>
+
+              {/* Priority Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Priority
+                </label>
+                <select
+                  value={filters.priority}
+                  onChange={(e) => updateFilters({ priority: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Priorities</option>
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Active Filters Display */}
+            {(filters.subject !== 'all' || filters.status !== 'all' || filters.priority !== 'all') && (
+              <div className="mt-3 flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Active filters:</span>
+                {filters.subject !== 'all' && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    Subject: {filters.subject}
+                  </span>
+                )}
+                {filters.status !== 'all' && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    Status: {filters.status}
+                  </span>
+                )}
+                {filters.priority !== 'all' && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    Priority: {filters.priority}
+                  </span>
+                )}
+                <button
+                  onClick={() => updateFilters({ subject: 'all', status: 'all', priority: 'all' })}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Clear all
+                </button>
               </div>
             )}
-          </Card>
-        </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
-};
 
-/**
- * LegendItem Component
- */
-const LegendItem = ({ color, label }) => {
-  const colorClasses = {
-    green: 'bg-green-500',
-    yellow: 'bg-yellow-500',
-    gray: 'bg-gray-400',
-    orange: 'bg-orange-500',
-    red: 'bg-red-500',
-    blue: 'bg-blue-500',
-  };
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className={`w-4 h-4 rounded-full ${colorClasses[color]}`} />
-      <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
-    </div>
-  );
-};
-
-/**
- * AssessmentMiniCard Component
- */
-const AssessmentMiniCard = ({ assessment, onClick }) => {
-  const statusColors = {
-    available: 'success',
-    'starting-soon': 'warning',
-    'deadline-soon': 'warning',
-    expired: 'danger',
-    completed: 'primary',
-    upcoming: 'secondary',
-  };
-
-  return (
-    <div
-      onClick={onClick}
-      className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-400 cursor-pointer transition-all"
-    >
-      <div className="flex items-start justify-between mb-2">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">
-          {assessment.title}
-        </h4>
-        <Badge variant={statusColors[assessment.status]} size="sm">
-          {assessment.status.replace('-', ' ')}
-        </Badge>
+      {/* Calendar View */}
+      <div className="flex-1 overflow-hidden p-6">
+        {error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <AlertCircle size={48} className="mx-auto text-red-500 mb-4" />
+              <p className="text-red-600 font-semibold">{error}</p>
+            </div>
+          </div>
+        ) : (
+          <CalendarView
+            events={filteredEvents}
+            view={view}
+            currentDate={currentDate}
+            onEventClick={handleEventClick}
+            userRole="student"
+            editable={false}
+          />
+        )}
       </div>
-      <div className="space-y-1 text-xs text-gray-600 dark:text-gray-400">
-        <div className="flex items-center">
-          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {formatDuration(assessment.duration)}
-        </div>
-        <div className="flex items-center">
-          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {assessment.totalMarks} marks
+
+      {/* Color Legend */}
+      <div className="bg-white border-t px-6 py-3">
+        <div className="flex items-center justify-center space-x-6 text-sm">
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded bg-red-500 mr-2"></div>
+            <span className="text-gray-700">Overdue</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded bg-orange-500 mr-2"></div>
+            <span className="text-gray-700">Due Soon (&lt;24h)</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded bg-gray-500 mr-2"></div>
+            <span className="text-gray-700">Upcoming</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded bg-blue-500 mr-2"></div>
+            <span className="text-gray-700">Submitted</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-4 h-4 rounded bg-green-500 mr-2"></div>
+            <span className="text-gray-700">Evaluated</span>
+          </div>
         </div>
       </div>
     </div>

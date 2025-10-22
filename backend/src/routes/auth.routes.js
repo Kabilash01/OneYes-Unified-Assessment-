@@ -6,6 +6,9 @@ const {
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  verifyResetToken,
+  resetPassword,
 } = require('../controllers/authController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const {
@@ -47,5 +50,26 @@ router.put('/profile', authMiddleware, updateProfile);
  * @access  Private
  */
 router.put('/change-password', authMiddleware, changePassword);
+
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset link
+ * @access  Public
+ */
+router.post('/forgot-password', forgotPassword);
+
+/**
+ * @route   POST /api/auth/verify-reset-token
+ * @desc    Verify password reset token
+ * @access  Public
+ */
+router.post('/verify-reset-token', verifyResetToken);
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Reset password with token
+ * @access  Public
+ */
+router.post('/reset-password', resetPassword);
 
 module.exports = router;

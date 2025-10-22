@@ -50,7 +50,7 @@ const Login = () => {
           navigate('/instructor/dashboard', { replace: true });
         } else if (role === 'admin') {
           console.log('👨‍💼 Redirecting to admin dashboard...');
-          navigate('/admin/dashboard', { replace: true });
+          navigate('/admin-dashboard', { replace: true });
         } else {
           console.log('🏠 Redirecting to home...');
           navigate('/', { replace: true });

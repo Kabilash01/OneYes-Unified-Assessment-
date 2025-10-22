@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .result { background: #f4f4f4; padding: 15px; margin: 10px 0; border-radius: 5px; max-height: 400px; overflow-y: auto; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Admin API Endpoint Tests</h1>
+    
+    <div>
+        <h3>1. Login</h3>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="login-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>2. Dashboard Stats</h3>
+        <button onclick="testDashboardStats()">Test Dashboard Stats</button>
+        <div id="stats-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>3. Get Users</h3>
+        <button onclick="testGetUsers()">Test Get Users</button>
+        <div id="users-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>4. Activity Logs</h3>
+        <button onclick="testActivityLogs()">Test Activity Logs</button>
+        <div id="logs-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>5. Notifications Count</h3>
+        <button onclick="testNotifications()">Test Notifications Count</button>
+        <div id="notif-result" class="result"></div>
+    </div>
+    
+    <div>
+        <h3>6. Platform Analytics</h3>
+        <button onclick="testAnalytics()">Test Platform Analytics</button>
+        <div id="analytics-result" class="result"></div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000/api';
+        let authToken = null;
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.innerHTML = '⏳ Testing login...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'admin@oneyes.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Login successful!<br>User: ${data.user.name} (${data.user.role})<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Login failed: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testDashboardStats() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('stats-result');
+            resultDiv.innerHTML = '⏳ Fetching dashboard stats...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/admin/dashboard/stats`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Dashboard stats retrieved<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testGetUsers() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('users-result');
+            resultDiv.innerHTML = '⏳ Fetching users...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/admin/users?page=1&limit=5`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Found ${data.users?.length || 0} users<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testActivityLogs() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('logs-result');
+            resultDiv.innerHTML = '⏳ Fetching activity logs...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/admin/logs?page=1&limit=5`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Found ${data.logs?.length || 0} logs<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testNotifications() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('notif-result');
+            resultDiv.innerHTML = '⏳ Fetching notifications count...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/admin/notifications/unread-count`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Unread notifications: ${data.unreadCount || 0}<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        async function testAnalytics() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('analytics-result');
+            resultDiv.innerHTML = '⏳ Fetching platform analytics...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/analytics/admin/platform`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `✅ Analytics retrieved<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `❌ Error: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

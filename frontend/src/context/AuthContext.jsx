@@ -30,11 +30,14 @@ export const AuthProvider = ({ children }) => {
 
           if (decoded.exp < currentTime) {
             // Token expired
+            console.log('🔴 Token expired, logging out');
             logout();
           } else {
             // Token valid, fetch fresh user data
             const response = await authAPI.getMe();
+            // API interceptor already unwraps response.data
             // Response structure: { success, data: { user } }
+            console.log('🔄 Auth initialized:', response);
             setUser(response.data.user);
             setIsAuthenticated(true);
           }
@@ -58,14 +61,15 @@ export const AuthProvider = ({ children }) => {
       console.log('🔐 Attempting login...');
       const response = await authAPI.login(credentials);
       console.log('📦 Full response:', response);
-      console.log('📦 Response.data:', response.data);
       
-      // Response structure: { success, data: { user, token } }
+      // API interceptor already unwraps response.data, so response IS the data
+      // Response structure after interceptor: { success, data: { user, token } }
       const { user: userData, token } = response.data;
       console.log('👤 User data:', userData);
       console.log('🔑 Token:', token ? 'Present' : 'Missing');
 
       if (!userData || !token) {
+        console.error('❌ Missing user or token in response:', response);
         throw new Error('Invalid response format: missing user or token');
       }
 
@@ -93,6 +97,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authAPI.register(userData);
+      // API interceptor already unwraps response.data
       // Response structure: { success, data: { user, token } }
       const { user: newUser, token } = response.data;
 
@@ -130,6 +135,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (data) => {
     try {
       const response = await authAPI.updateProfile(data);
+      // API interceptor already unwraps response.data
       // Response structure: { success, data: { user } }
       const updatedUser = response.data.user;
 

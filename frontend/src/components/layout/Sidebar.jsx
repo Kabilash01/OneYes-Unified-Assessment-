@@ -11,7 +11,9 @@ import {
   HelpCircle, 
   LogOut,
   X,
-  Menu
+  Menu,
+  MessageSquare,
+  BarChart2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -90,6 +92,8 @@ const Sidebar = () => {
     { icon: CalendarCheck, label: 'Upcoming Tests', path: '/student/upcoming-tests' },
     { icon: FileText, label: 'My Submissions', path: '/student/submissions' },
     { icon: Calendar, label: 'Calendar', path: '/student/calendar' },
+    { icon: BarChart2, label: 'Analytics', path: '/student/analytics' },
+    { icon: MessageSquare, label: 'Support', path: '/student/support' },
     { icon: User, label: 'Profile', path: '/student/profile' },
     { icon: Settings, label: 'Settings', path: '/student/settings' },
     { icon: HelpCircle, label: 'Help & Support', path: '/student/help' },

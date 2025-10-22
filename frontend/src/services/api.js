@@ -117,8 +117,17 @@ export const adminAPI = {
   getAllAssessments: (params) => api.get('/admin/assessments', { params }),
   flagAssessment: (id, data) => api.put(`/admin/assessments/${id}/flag`, data),
   getLogs: (params) => api.get('/admin/logs', { params }),
-  updateBranding: (data) => api.put('/admin/settings/branding', data),
+  exportLogs: (params) => api.get('/admin/logs/export', { params, responseType: 'blob' }),
+  getBranding: () => api.get('/admin/settings/branding'),
+  updateBranding: (formData) => {
+    return api.put('/admin/settings/branding', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   archiveOldData: (data) => api.post('/admin/settings/reset', data),
+  getSuspiciousAlerts: (params) => api.get('/admin/alerts', { params }),
 };
 
 export default api;
